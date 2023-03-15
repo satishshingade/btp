@@ -1,0 +1,201 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var dist = 
+    /* color: #98ff00 */
+    /* shown: false */
+    /* displayProperties: [
+      {
+        "type": "rectangle"
+      }
+    ] */
+    ee.Geometry.Polygon(
+        [[[86.80458983629018, 22.760122059075286],
+          [86.80458983629018, 21.91669781908535],
+          [87.86477050035268, 21.91669781908535],
+          [87.86477050035268, 22.760122059075286]]], null, false),
+    rice1 = /* color: #fcff0a */ee.FeatureCollection(
+        [ee.Feature(
+            ee.Geometry.Polygon(
+                [[[87.13877870993949, 22.454769677004858],
+                  [87.13772728400565, 22.454283822038335],
+                  [87.13867142157889, 22.453688895270567],
+                  [87.13926150756217, 22.45432348373207],
+                  [87.13875725226737, 22.454839084718238]]]),
+            {
+              "class": 1,
+              "system:index": "0"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[87.14229776816703, 22.453897119929678],
+                  [87.14235141234732, 22.453252614018346],
+                  [87.14282348113395, 22.453302191502512],
+                  [87.14225485282279, 22.454026020752412]]]),
+            {
+              "class": 1,
+              "system:index": "1"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[87.1442200423883, 22.458292616391798],
+                  [87.14378016010986, 22.458094313487578],
+                  [87.14406983868346, 22.457687791647],
+                  [87.14448826328979, 22.457618385359947],
+                  [87.1446170093225, 22.458064568027467]]]),
+            {
+              "class": 1,
+              "system:index": "2"
+            })]),
+    rice2 = 
+    /* color: #0b4a8b */
+    /* shown: false */
+    ee.FeatureCollection(
+        [ee.Feature(
+            ee.Geometry.Polygon(
+                [[[87.1372771558632, 22.46209612174809],
+                  [87.13663342569963, 22.46138224955595],
+                  [87.13798525904313, 22.4599346641003],
+                  [87.13920834635393, 22.46098565230472]]]),
+            {
+              "class": 2,
+              "system:index": "0"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[87.14710421289205, 22.4457372264934],
+                  [87.14611715997457, 22.445558737730497],
+                  [87.1462673636794, 22.444329142233435],
+                  [87.14746899331807, 22.444864612580083]]]),
+            {
+              "class": 2,
+              "system:index": "1"
+            })]),
+    rice3 = /* color: #ffc82d */ee.FeatureCollection([]),
+    rice4 = 
+    /* color: #00ffff */
+    /* shown: false */
+    ee.FeatureCollection([]),
+    rice5 = 
+    /* color: #bf04c2 */
+    /* shown: false */
+    ee.FeatureCollection([]),
+    urban = 
+    /* color: #00ff00 */
+    /* shown: false */
+    ee.FeatureCollection([]),
+    water = 
+    /* color: #0000ff */
+    /* shown: false */
+    ee.FeatureCollection([]),
+    other = 
+    /* color: #999900 */
+    /* shown: false */
+    ee.FeatureCollection([]);
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+var sentinel1 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-06-01', '2021-06-15')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                    .filterBounds(dist);
+
+var sentinel2 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-06-16', '2021-06-30')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                     .filterBounds(dist);
+var sentinel3 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-07-01', '2021-07-15')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                     .filterBounds(dist);
+var sentinel4 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-07-16', '2021-07-31')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                     .filterBounds(dist);
+                    
+var sentinel5 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-08-01', '2021-08-15')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                     .filterBounds(dist);
+var sentinel6 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-08-16', '2021-08-31')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                     .filterBounds(dist);   
+var sentinel7 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-09-01', '2021-09-15')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                     .filterBounds(dist); 
+var sentinel8 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-09-16', '2021-09-30')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                    .filterBounds(dist);  
+var sentinel9 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-10-01', '2021-10-15')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                    .filterBounds(dist);
+var sentinel10 = ee.ImageCollection('COPERNICUS/S1_GRD')
+                    .filterDate('2021-10-16', '2021-10-31')
+                    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+                    .filter(ee.Filter.eq('instrumentMode', 'IW'))
+                    .filter(ee.Filter.or((ee.Filter.eq('orbitProperties_pass', 'ASCENDING'), ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))))
+                    .filterBounds(dist);
+
+// it will create composite data 
+
+var image1 = sentinel1.select('VH').mean().rename('VH1');
+var image2 = sentinel2.select('VH').mean().rename('VH2');
+var image3 = sentinel3.select('VH').mean().rename('VH3');
+var image4 = sentinel4.select('VH').mean().rename('VH4');
+var image5 = sentinel5.select('VH').mean().rename('VH5');
+var image6 = sentinel6.select('VH').mean().rename('VH6');
+var image7 = sentinel7.select('VH').mean().rename('VH7');
+var image8 = sentinel8.select('VH').mean().rename('VH8');
+var image9 = sentinel9.select('VH').mean().rename('VH9');
+var image10 = sentinel10.select('VH').mean().rename('VH10');
+
+// stack those bands
+
+var stacked = image1.addBands([image2,image3,image4,image5,image6,image7,image8,image9,image10]).clip(dist);
+print(stacked);
+
+// scaled to make it value of pixel +ve
+var stacked_scaled = stacked.multiply(10).add(350).uint8();
+// color code explain
+var bands = ['VH2', 'VH4', 'VH9'];
+var display = {bands: bands, min: 0, max: 255};
+Map.addLayer(stacked_scaled, display, 'stacked');
+
+// major transplant is vh4
+// meganta shows the rice plants 
+// when transplant in vh2 it looks blue
+// when transplant in vh4 it looks magenta 
+
+
+var collection = ee.ImageCollection('COPERNICUS/S2_SR') 
+                   .filterDate('2021-09-25', '2021-11-05')
+                   .filterBounds(dist);
+var im = collection.median().clip(dist);
+var S2_bands = ['B8', 'B4', 'B3'];
+var S2_display = {bands: S2_bands, min: 0, max: 4000};
+Map.addLayer(im, S2_display, 'im');
+
+// create signatures to train our algorithm
+
+// blue color are early rice 
+// we will capture the signature of that first 
+
+

@@ -481,4 +481,63 @@ print('Resubstitution error matrix: ', trainAccuracy);
 print('Training overall accuracy: ', trainAccuracy.accuracy());
 
 
+var bandInfo = {
+  'VH1': {v: 1, f: 'June_1FN'},
+  'VH2': {v: 2, f: 'June_2FN'},
+  'VH3': {v: 3, f: 'July_1FN'},
+  'VH4': {v: 4, f: 'July_2FN'},
+  'VH5': {v: 5, f: 'Aug_1FN'},
+  'VH6': {v: 6, f: 'Aug_2FN'},
+  'VH7': {v: 7, f: 'Sep_1FN'},
+  'VH8': {v: 8, f: 'Sep_2FN'},
+  'VH9': {v: 9, f: 'Oct_1FN'},
+  'VH10': {v: 10, f: 'Oct_2FN'}
+
+  
+};
+
+var xPropVals = [];    // List to codify x-axis band names as values.
+var xPropLabels = [];  // Holds dictionaries that label codified x-axis values.
+for (var key in bandInfo) {
+  xPropVals.push(bandInfo[key].v);
+  xPropLabels.push(bandInfo[key]);
+}
+var regionsBand =
+    gt1
+        .reduceToImage({properties: ['class'], reducer: ee.Reducer.first()})
+         .rename('class');
+
+var sentinelSrClass = stacked_scaled.addBands(regionsBand);
+       // print(sentinelSrClass);
+var chart = ui.Chart.image
+                .byClass({
+                  image: sentinelSrClass,
+                  classBand: 'class',
+                  region: gt1,
+                  reducer: ee.Reducer.mean(),
+                  scale: 10,
+                //  classLabels: ['Mustard', 'Wheat'],
+                  xLabels: xPropVals
+                })
+                .setChartType('ScatterChart')
+                .setOptions({
+                  title: 'Temporal Signatures - Backscatter',
+                  hAxis: {
+                    title: 'Dates',
+                    titleTextStyle: {italic: false, bold: true},
+                    viewWindow: {min: bands[0], max: bands[9]},
+                    ticks: xPropLabels
+                  },
+                  vAxis: {
+                    title: 'Backscatter(Scaled)',
+                    titleTextStyle: {italic: false, bold: true},
+                    viewWindow: {min: 0, max: 250},
+                  },
+                  colors: ['red', 'blue', 'grey', 'green', 'yellow', 'magenta', 'cyan', 'green'],
+                  pointSize: 0,
+                  lineSize: 2,
+                  curveType: 'function'
+                });
+print(chart);
+
 

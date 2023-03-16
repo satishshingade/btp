@@ -429,3 +429,47 @@ Map.addLayer(im, S2_display, 'im');
 // classify 
 // add gt
 var gt1 =  rice1.merge(rice2).merge(rice3).merge(rice4).merge(rice5).merge(urban).merge(water).merge(other);
+
+// creating training signature 
+var training = stacked_scaled.sampleRegions({
+  collection: gt1,
+  properties: ['class'],
+  scale: 10
+});
+
+// Make a Random Forest classifier and train it.
+var classifier = ee.Classifier.smileRandomForest(10)
+    .train({
+      features: training,
+      classProperty: 'class',
+      
+    });
+var classified = stacked_scaled.classify(classifier);
+
+var masked = classified.updateMask(classified.lt(6));
+
+// this masked area is a yellow area which represents rice plantation
+// we can separately give color to each sector
+Map.addLayer(masked,
+             {min: 1, max:5 , palette: ['yellow','yellow','yellow','yellow','yellow' ]},
+             'classification');
+             
+
+// area calculations now
+             
+// masked is the paramater which area you want to calucalate for 
+var areaImage = ee.Image.pixelArea().addBands(masked);
+var areas = areaImage.reduceRegion({
+  reducer: ee.Reducer.sum().group({
+    groupField: 1,
+    groupName: 'class',
+  }),
+  geometry: dist,
+  scale: 10,
+  maxPixels: 1e13,
+  //tileScale: 8
+});
+
+// Print the area calculations.
+print('##### CLASS AREA SQ. METERS #####');
+print(areas);

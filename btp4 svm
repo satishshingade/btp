@@ -1388,11 +1388,11 @@ Map.addLayer(stacked_scaled, display, 'stacked');
 var collection = ee.ImageCollection('COPERNICUS/S2_SR') 
                    .filterDate('2021-09-25', '2021-11-05')
                    .filterBounds(dist);
-var im = collection.median().clip(dist);
-var S2_bands = ['B8', 'B4', 'B3'];
-var S2_display = {bands: S2_bands, min: 0, max: 4000};
-Map.addLayer(im, S2_display, 'im');
-Map.setCenter(87.61,23.84,8);
+// var im = collection.median().clip(dist);
+// var S2_bands = ['B8', 'B4', 'B3'];
+// var S2_display = {bands: S2_bands, min: 0, max: 4000};
+// Map.addLayer(im, S2_display, 'im');
+// Map.setCenter(87.61,23.84,8);
 
 var gt1 =  rice1.merge(rice2).merge(rice3).merge(rice4).merge(rice5).merge(urban).merge(water).merge(other);
 
@@ -1402,11 +1402,17 @@ var training = stacked_scaled.sampleRegions({
   scale: 10
 });
 // Make a Random Forest classifier and train it.
-var classifier = ee.Classifier.smileRandomForest.train({
+var classifier = ee.Classifier.libsvm().train({
       features: training,
       classProperty: 'class',
       
     });
+// var classifier = ee.Classifier.smileRandomForest(10)
+//     .train({
+//       features: training,
+//       classProperty: 'class',
+      
+//     });
 var classified = stacked_scaled.classify(classifier);
 
 var masked = classified.updateMask(classified.lt(6));

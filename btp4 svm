@@ -1401,25 +1401,41 @@ var training = stacked_scaled.sampleRegions({
   properties: ['class'],
   scale: 10
 });
+
+
+Map.addLayer(training,
+            {min: 1, max:5 , palette: ['blue','blue','blue','blue','blue' ]},
+            'training');
+
+
 // Make a Random Forest classifier and train it.
-var classifier = ee.Classifier.libsvm().train({
-      features: training,
-      classProperty: 'class',
-      
-    });
+// var classifier = ee.Classifier.libsvm({
+//   kernelType: 'RBF',
+//   gamma: 0.1,
+//   cost: 10
+// });
+    
 // var classifier = ee.Classifier.smileRandomForest(10)
 //     .train({
 //       features: training,
 //       classProperty: 'class',
       
 //     });
+
+// var trained=classifier.train(training,'class',bands);
+
+var classifier = ee.Classifier.libsvm().train({
+  features: training,
+  classProperty: 'class',
+  inputProperties: bands});
+
 var classified = stacked_scaled.classify(classifier);
 
-var masked = classified.updateMask(classified.lt(6));
+// var masked = classified.updateMask(classified.lt(6));
 
-Map.addLayer(masked,
-             {min: 1, max:5 , palette: ['yellow','yellow','yellow','yellow','yellow' ]},
-             'classification');
+Map.addLayer(classified,
+            {min: 1, max:5 , palette: ['yellow','yellow','yellow','yellow','yellow' ]},
+            'classification');
 
 // var areaImage = ee.Image.pixelArea().addBands(masked);
 // var areas = areaImage.reduceRegion({

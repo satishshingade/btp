@@ -1402,8 +1402,7 @@ var training = stacked_scaled.sampleRegions({
   scale: 10
 });
 // Make a Random Forest classifier and train it.
-var classifier = ee.Classifier.smileRandomForest(10)
-    .train({
+var classifier = ee.Classifier.libsvm().train({
       features: training,
       classProperty: 'class',
       

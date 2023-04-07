@@ -1402,7 +1402,7 @@ var training = stacked_scaled.sampleRegions({
   scale: 10
 });
 // Make a Random Forest classifier and train it.
-var classifier = ee.Classifier.libsvm().train({
+var classifier = ee.Classifier.smileRandomForest.train({
       features: training,
       classProperty: 'class',
       
@@ -1415,98 +1415,98 @@ Map.addLayer(masked,
              {min: 1, max:5 , palette: ['yellow','yellow','yellow','yellow','yellow' ]},
              'classification');
 
-var areaImage = ee.Image.pixelArea().addBands(masked);
-var areas = areaImage.reduceRegion({
-  reducer: ee.Reducer.sum().group({
-    groupField: 1,
-    groupName: 'class',
-  }),
-  geometry: dist,
-  scale: 10,
-  maxPixels: 1e13,
-  //tileScale: 8
-});
+// var areaImage = ee.Image.pixelArea().addBands(masked);
+// var areas = areaImage.reduceRegion({
+//   reducer: ee.Reducer.sum().group({
+//     groupField: 1,
+//     groupName: 'class',
+//   }),
+//   geometry: dist,
+//   scale: 10,
+//   maxPixels: 1e13,
+//   //tileScale: 8
+// });
 
-// Print the area calculations.
-print('##### CLASS AREA SQ. METERS #####');
-print(areas);
+// // Print the area calculations.
+// print('##### CLASS AREA SQ. METERS #####');
+// print(areas);
 
-// Get a confusion matrix representing resubstitution accuracy.
-var trainAccuracy = classifier.confusionMatrix();
-print('Resubstitution error matrix: ', trainAccuracy);
-print('Training overall accuracy: ', trainAccuracy.accuracy());
+// // Get a confusion matrix representing resubstitution accuracy.
+// var trainAccuracy = classifier.confusionMatrix();
+// print('Resubstitution error matrix: ', trainAccuracy);
+// print('Training overall accuracy: ', trainAccuracy.accuracy());
 
-// Sample the input with a different random seed to get validation data.
-var validation = stacked_scaled.sampleRegions({
-  collection: gt1,
-  properties: ['class'],
-  scale: 10
-});
+// // Sample the input with a different random seed to get validation data.
+// var validation = stacked_scaled.sampleRegions({
+//   collection: gt1,
+//   properties: ['class'],
+//   scale: 10
+// });
 
-// Classify the validation data.
-var validated = validation.classify(classifier);
+// // Classify the validation data.
+// var validated = validation.classify(classifier);
 
-// Get a confusion matrix representing expected accuracy.
-var testAccuracy = validated.errorMatrix('class', 'classification');
-print('Validation error matrix: ', testAccuracy);
-print('Validation overall accuracy: ', testAccuracy.accuracy());
+// // Get a confusion matrix representing expected accuracy.
+// var testAccuracy = validated.errorMatrix('class', 'classification');
+// print('Validation error matrix: ', testAccuracy);
+// print('Validation overall accuracy: ', testAccuracy.accuracy());
           
-var bandInfo = {
-  'VH1': {v: 1, f: 'June_1FN'},
-  'VH2': {v: 2, f: 'June_2FN'},
-  'VH3': {v: 3, f: 'July_1FN'},
-  'VH4': {v: 4, f: 'July_2FN'},
-  'VH5': {v: 5, f: 'Aug_1FN'},
-  'VH6': {v: 6, f: 'Aug_2FN'},
-  'VH7': {v: 7, f: 'Sep_1FN'},
-  'VH8': {v: 8, f: 'Sep_2FN'},
-  'VH9': {v: 9, f: 'Oct_1FN'},
-  'VH10': {v: 10, f: 'Oct_2FN'}
+// var bandInfo = {
+//   'VH1': {v: 1, f: 'June_1FN'},
+//   'VH2': {v: 2, f: 'June_2FN'},
+//   'VH3': {v: 3, f: 'July_1FN'},
+//   'VH4': {v: 4, f: 'July_2FN'},
+//   'VH5': {v: 5, f: 'Aug_1FN'},
+//   'VH6': {v: 6, f: 'Aug_2FN'},
+//   'VH7': {v: 7, f: 'Sep_1FN'},
+//   'VH8': {v: 8, f: 'Sep_2FN'},
+//   'VH9': {v: 9, f: 'Oct_1FN'},
+//   'VH10': {v: 10, f: 'Oct_2FN'}
 
   
-};
+// };
 
-var xPropVals = [];    // List to codify x-axis band names as values.
-var xPropLabels = [];  // Holds dictionaries that label codified x-axis values.
-for (var key in bandInfo) {
-  xPropVals.push(bandInfo[key].v);
-  xPropLabels.push(bandInfo[key]);
-}
-var regionsBand =
-    gt1
-        .reduceToImage({properties: ['class'], reducer: ee.Reducer.first()})
-         .rename('class');
+// var xPropVals = [];    // List to codify x-axis band names as values.
+// var xPropLabels = [];  // Holds dictionaries that label codified x-axis values.
+// for (var key in bandInfo) {
+//   xPropVals.push(bandInfo[key].v);
+//   xPropLabels.push(bandInfo[key]);
+// }
+// var regionsBand =
+//     gt1
+//         .reduceToImage({properties: ['class'], reducer: ee.Reducer.first()})
+//         .rename('class');
 
-var sentinelSrClass = stacked_scaled.addBands(regionsBand);
-       // print(sentinelSrClass);
-var chart = ui.Chart.image
-                .byClass({
-                  image: sentinelSrClass,
-                  classBand: 'class',
-                  region: gt1,
-                  reducer: ee.Reducer.mean(),
-                  scale: 10,
-                //  classLabels: ['Mustard', 'Wheat'],
-                  xLabels: xPropVals
-                })
-                .setChartType('ScatterChart')
-                .setOptions({
-                  title: 'Temporal Signatures - Backscatter',
-                  hAxis: {
-                    title: 'Dates',
-                    titleTextStyle: {italic: false, bold: true},
-                    viewWindow: {min: bands[0], max: bands[9]},
-                    ticks: xPropLabels
-                  },
-                  vAxis: {
-                    title: 'Backscatter(Scaled)',
-                    titleTextStyle: {italic: false, bold: true},
-                    viewWindow: {min: 0, max: 250},
-                  },
-                  colors: ['red', 'blue', 'grey', 'green', 'yellow', 'magenta', 'cyan', 'green'],
-                  pointSize: 0,
-                  lineSize: 2,
-                  curveType: 'function'
-                });
-print(chart);     
+// var sentinelSrClass = stacked_scaled.addBands(regionsBand);
+//       // print(sentinelSrClass);
+// var chart = ui.Chart.image
+//                 .byClass({
+//                   image: sentinelSrClass,
+//                   classBand: 'class',
+//                   region: gt1,
+//                   reducer: ee.Reducer.mean(),
+//                   scale: 10,
+//                 //  classLabels: ['Mustard', 'Wheat'],
+//                   xLabels: xPropVals
+//                 })
+//                 .setChartType('ScatterChart')
+//                 .setOptions({
+//                   title: 'Temporal Signatures - Backscatter',
+//                   hAxis: {
+//                     title: 'Dates',
+//                     titleTextStyle: {italic: false, bold: true},
+//                     viewWindow: {min: bands[0], max: bands[9]},
+//                     ticks: xPropLabels
+//                   },
+//                   vAxis: {
+//                     title: 'Backscatter(Scaled)',
+//                     titleTextStyle: {italic: false, bold: true},
+//                     viewWindow: {min: 0, max: 250},
+//                   },
+//                   colors: ['red', 'blue', 'grey', 'green', 'yellow', 'magenta', 'cyan', 'green'],
+//                   pointSize: 0,
+//                   lineSize: 2,
+//                   curveType: 'function'
+//                 });
+// print(chart);     
         

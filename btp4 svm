@@ -1396,16 +1396,19 @@ var collection = ee.ImageCollection('COPERNICUS/S2_SR')
 
 var gt1 =  rice1.merge(rice2).merge(rice3).merge(rice4).merge(rice5).merge(urban).merge(water).merge(other);
 
+
+
+// var training = stacked_scaled.sampleRegions({
+//   collection: gt1,
+//   properties: ['class'],
+//   scale: 30
+// });
+
 var training = stacked_scaled.sampleRegions({
   collection: gt1,
   properties: ['class'],
-  scale: 10
+  scale: 30
 });
-
-
-Map.addLayer(training,
-            {min: 1, max:5 , palette: ['blue','blue','blue','blue','blue' ]},
-            'training');
 
 
 // Make a Random Forest classifier and train it.
@@ -1424,54 +1427,65 @@ Map.addLayer(training,
 
 // var trained=classifier.train(training,'class',bands);
 
+
+// var classifier = ee.Classifier.libsvm({
+//   kernelType: 'RBF',
+//   gamma: 0.5,
+//   cost:10
+// });
+// var trained = classifier.train(training, 'class', bands);
+// var classified = stacked_scaled.classify(trained);
+
+
 var classifier = ee.Classifier.libsvm().train({
   features: training,
   classProperty: 'class',
-  inputProperties: bands});
+  inputProperties: stacked_scaled.bandNames()
+});
 
-var classified = stacked_scaled.classify(classifier);
+ var classified = stacked_scaled.classify(classifier);
 
-// var masked = classified.updateMask(classified.lt(6));
+ var masked = classified.updateMask(classified.lt(6));
 
-Map.addLayer(classified,
-            {min: 1, max:5 , palette: ['yellow','yellow','yellow','yellow','yellow' ]},
+Map.addLayer(masked,
+            {min: -100000, max:100000 , palette: ['yellow','yellow','yellow','yellow','yellow' ]},
             'classification');
 
-// var areaImage = ee.Image.pixelArea().addBands(masked);
-// var areas = areaImage.reduceRegion({
-//   reducer: ee.Reducer.sum().group({
-//     groupField: 1,
-//     groupName: 'class',
-//   }),
-//   geometry: dist,
-//   scale: 10,
-//   maxPixels: 1e13,
-//   //tileScale: 8
-// });
+var areaImage = ee.Image.pixelArea().addBands(masked);
+var areas = areaImage.reduceRegion({
+  reducer: ee.Reducer.sum().group({
+    groupField: 1,
+    groupName: 'class',
+  }),
+  geometry: dist,
+  scale: 10,
+  maxPixels: 1e13,
+  //tileScale: 8
+});
 
-// // Print the area calculations.
-// print('##### CLASS AREA SQ. METERS #####');
-// print(areas);
+// Print the area calculations.
+print('##### CLASS AREA SQ. METERS #####');
+print(areas);
 
-// // Get a confusion matrix representing resubstitution accuracy.
-// var trainAccuracy = classifier.confusionMatrix();
-// print('Resubstitution error matrix: ', trainAccuracy);
-// print('Training overall accuracy: ', trainAccuracy.accuracy());
+// Get a confusion matrix representing resubstitution accuracy.
+var trainAccuracy = classifier.confusionMatrix();
+print('Resubstitution error matrix: ', trainAccuracy);
+print('Training overall accuracy: ', trainAccuracy.accuracy());
 
-// // Sample the input with a different random seed to get validation data.
-// var validation = stacked_scaled.sampleRegions({
-//   collection: gt1,
-//   properties: ['class'],
-//   scale: 10
-// });
+// Sample the input with a different random seed to get validation data.
+var validation = stacked_scaled.sampleRegions({
+  collection: gt1,
+  properties: ['class'],
+  scale: 10
+});
 
-// // Classify the validation data.
-// var validated = validation.classify(classifier);
+// Classify the validation data.
+var validated = validation.classify(classifier);
 
-// // Get a confusion matrix representing expected accuracy.
-// var testAccuracy = validated.errorMatrix('class', 'classification');
-// print('Validation error matrix: ', testAccuracy);
-// print('Validation overall accuracy: ', testAccuracy.accuracy());
+// Get a confusion matrix representing expected accuracy.
+var testAccuracy = validated.errorMatrix('class', 'classification');
+print('Validation error matrix: ', testAccuracy);
+print('Validation overall accuracy: ', testAccuracy.accuracy());
           
 // var bandInfo = {
 //   'VH1': {v: 1, f: 'June_1FN'},

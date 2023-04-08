@@ -1429,9 +1429,9 @@ var training = stacked_scaled.sampleRegions({
 
 
 // var classifier = ee.Classifier.libsvm({
-//   kernelType: 'RBF',
-//   gamma: 0.5,
-//   cost:10
+//   kernelType: 'linear',
+//   // gamma: 0.5,
+//   // cost:10
 // });
 // var trained = classifier.train(training, 'class', bands);
 // var classified = stacked_scaled.classify(trained);
@@ -1443,7 +1443,7 @@ var classifier = ee.Classifier.libsvm().train({
   inputProperties: stacked_scaled.bandNames()
 });
 
- var classified = stacked_scaled.classify(classifier);
+var classified = stacked_scaled.classify(classifier);
 
  var masked = classified.updateMask(classified.lt(6));
 

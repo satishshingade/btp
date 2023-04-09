@@ -1,3 +1,4 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var geometry = 
     /* color: #98ff00 */
     /* shown: false */
@@ -5697,5 +5698,7 @@ var geometry =
               "class": 9,
               "system:index": "36"
             })]);
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+
   
   
